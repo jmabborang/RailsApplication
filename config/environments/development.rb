@@ -6,6 +6,10 @@ Rails.application.configure do
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
+  config.cache_classes = false
+  config.file_watcher = ActiveSupport::FileUpdateChecker
+  config.reload_classes_only_on_change = false
+
   # Do not eager load code on boot.
   config.eager_load = false
 
