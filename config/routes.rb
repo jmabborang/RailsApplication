@@ -8,6 +8,6 @@ Rails.application.routes.draw do
   # Smoke-test endpoints
   get 'test', to: 'test#show'
 
-  # Temporary auth endpoint (no database)
+  # Authentication
   post 'api/v1/auth/login', to: 'auth#login'
 end
