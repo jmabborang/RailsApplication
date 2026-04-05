@@ -12,7 +12,7 @@ default: &default
 development:
   adapter: sqlserver
   host: localhost
-  database: blank_pph
+  database: ims
   username: sa
   password: masterkey_2233#
   port: 2019

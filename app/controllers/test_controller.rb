@@ -1,5 +1,6 @@
 class TestController < ActionController::API
 	def show 
-		render json: { status: true }
+		puts "test Controller"
+		render json: { status: true, name: 'Ian Nathan Mabborang'}
 	end
 end
