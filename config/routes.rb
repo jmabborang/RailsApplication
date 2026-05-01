@@ -10,4 +10,5 @@ Rails.application.routes.draw do
 
   # Authentication
   post 'api/v1/auth/login', to: 'auth#login'
+  get 'test/transaction_sample', to: 'test#transaction_sample'
 end
