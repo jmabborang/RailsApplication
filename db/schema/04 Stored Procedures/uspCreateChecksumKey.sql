@@ -10,7 +10,7 @@ AS
 	DECLARE @PrivateKey VARCHAR(100) = '2-444-66666-88888888'
 
 	-- Generate the CheckSumValue
-	SELECT [Name], [Description], CHECKSUM([Name] + @Salt)  
+	SELECT [Name], [Description], ABS(BINARY_CHECKSUM([Name] + @Salt)) AS CheckSumValue
 	FROM tblAccessKeys
 	WHERE CheckSumValue IS NULL
 
