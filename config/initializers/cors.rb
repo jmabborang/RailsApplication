@@ -5,13 +5,18 @@
 
 # Read more: https://github.com/cyu/rack-cors
 
+frontend_origins = ENV.fetch('FRONTEND_ORIGINS', Rails.env.production? ? '' : 'http://localhost:5173')
+                      .split(',').map(&:strip).reject(&:blank?)
+Rails.application.config.x.frontend_origins = frontend_origins
+raise 'FRONTEND_ORIGINS must be set in production' if Rails.env.production? && frontend_origins.empty?
+
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'http://localhost:5173'
+    origins(*frontend_origins)
 
     resource '*',
       headers: :any,
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: false
+      credentials: true
   end
 end

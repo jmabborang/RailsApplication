@@ -1,11 +1,12 @@
 class AuthController < ApplicationController
   skip_before_action :authorize_request, only: :login
+  skip_before_action :verify_session_csrf, only: :login
 
   def login
     username = (params[:username] || params[:Username]).to_s.strip
     password = (params[:password] || params[:Password]).to_s
 
-    
+
     if username.blank? || password.blank?
       return render json: {
         success: false,
@@ -28,18 +29,19 @@ class AuthController < ApplicationController
     if user&.authenticate_password(password)
       log_login_attempt(username: username, status: 'ok')
 
-      token = JsonWebToken.encode(user_id: user.Id)
+      AuthSession.from_token(cookies[session_cookie_name])&.destroy!
+      remember = ActiveModel::Type::Boolean.new.cast(params[:IsRemember] || params[:remember])
+      session, raw_token = AuthSession.issue_for(user, remember: remember)
+      cookie_options = session_cookie_options.merge(value: raw_token)
+      cookie_options[:expires] = session.expires_at if remember
+      cookies[session_cookie_name] = cookie_options
 
       render json: {
         success: true,
         message: 'Login successful.',
         client_request_id: params[:ClientRequestId],
-        token: token,
-        token_type: 'Bearer',
-        user: {
-          id: user.Id,
-          username: user.LoginName
-        }
+        csrf_token: session.csrf_token(raw_token),
+        user: user_payload(user)
       }, status: :ok
     else
       attempts_count = nil
@@ -65,7 +67,25 @@ class AuthController < ApplicationController
     end
   end
 
+  def me
+    render json: {
+      user: user_payload(current_user),
+      csrf_token: current_session.csrf_token(raw_session_token)
+    }, status: :ok
+  end
+
+  def logout
+    current_session.destroy!
+    cookies.delete(session_cookie_name, session_cookie_options)
+    head :no_content
+  end
+
   private
+
+  def user_payload(user)
+    { id: user.Id, username: user.LoginName }
+  end
+
   def log_login_attempt(username:, status:)
     LoginLogs.create(
       Username: username.to_s.presence || 'unknown',
@@ -78,9 +98,6 @@ class AuthController < ApplicationController
   end
 
   def logged_ip_address
-    supplied_ip = (params[:IPAddress] || params[:ip_address]).to_s.strip
-    return supplied_ip if supplied_ip.present?
-
     request.remote_ip.to_s.presence || request.ip.to_s.presence || 'unknown'
   end
 end

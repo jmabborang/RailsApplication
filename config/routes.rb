@@ -10,4 +10,7 @@ Rails.application.routes.draw do
 
   # Authentication
   post 'api/v1/auth/login', to: 'auth#login'
+  get 'api/v1/auth/me', to: 'auth#me'
+  post 'api/v1/auth/logout', to: 'auth#logout'
+  get 'department/list', to: 'department#list'
 end
