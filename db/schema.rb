@@ -10,14 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_000001) do
   create_table "auth_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "expires_at", null: false
+    t.datetime "expires_at"
+    t.string "previous_token_digest", limit: 64
+    t.datetime "previous_token_valid_until"
+    t.boolean "remembered", default: false, null: false
+    t.datetime "rotated_at"
     t.string "token_digest", limit: 64, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["expires_at"], name: "index_auth_sessions_on_expires_at"
+    t.index ["previous_token_digest"], name: "index_auth_sessions_on_previous_token_digest"
     t.index ["token_digest"], name: "index_auth_sessions_on_token_digest", unique: true
     t.index ["user_id"], name: "index_auth_sessions_on_user_id"
   end

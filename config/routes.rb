@@ -11,6 +11,10 @@ Rails.application.routes.draw do
   # Authentication
   post 'api/v1/auth/login', to: 'auth#login'
   get 'api/v1/auth/me', to: 'auth#me'
+  post 'api/v1/auth/heartbeat', to: 'auth#heartbeat'
+  post 'api/v1/auth/idle_expire', to: 'auth#idle_expire'
+  post 'api/v1/auth/activity', to: 'auth#activity'
+  post 'api/v1/auth/refresh', to: 'auth#refresh'
   post 'api/v1/auth/logout', to: 'auth#logout'
   get 'department/list', to: 'department#list'
 end

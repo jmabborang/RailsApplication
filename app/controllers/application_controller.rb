@@ -32,7 +32,7 @@ class ApplicationController < ActionController::API
 
   def verify_session_csrf
     supplied_token = request.headers['X-CSRF-Token']
-    return if current_session&.valid_csrf_token?(raw_session_token, supplied_token)
+    return if current_session&.valid_csrf_token?(supplied_token)
 
     render json: { error: 'Invalid CSRF token' }, status: :forbidden
   end
